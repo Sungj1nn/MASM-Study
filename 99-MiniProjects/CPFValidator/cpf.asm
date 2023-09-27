@@ -7,8 +7,9 @@ maxLen = 512
 .const
     ttlStr     byte  "CPF Validator",nll
     promptStr  byte  "Type your CPF: ",nll
-    isValid    byte  "Your CPF is valid! :D",nl,nll
-    isInvalid  byte  "Your CPF is invalid! :c",nl,nll
+    isValid    byte  "Your CPF is valid! =D",nl,nll
+    isInvalid  byte  "Your CPF is invalid! =c",nl,nll
+    sizeWrong  byte  "Size of string is invalid! =(",nl,nll
     divis      dword   0bh
     mult       dword   0ah
 
@@ -27,12 +28,46 @@ maxLen = 512
         ret
     getTitle endp
 
+    strlen proc
+
+        sub rsp, 48
+
+        xor rax, rax
+
+        mov rdi, rdx
+
+        repne scasb
+
+        sub rdi, rdx
+
+        mov rax, rdi
+
+        add rsp, 48
+        ret
+
+    strlen endp
+
     valCPF proc
 
         sub rsp, 56
 
         push rcx
+        push rdi
 
+        mov rdx, rcx
+
+        call strlen
+        pop rdi
+
+        cmp eax, 0ch
+        je sizeRight
+
+        pop rcx
+        lea rcx, sizeWrong
+        call printf
+        jmp allDone
+
+    sizeRight:
         xor rax, rax
         mov r8, 0ah
         xor r9, r9
